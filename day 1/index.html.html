@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vocabulary Test</title>
+  <style>
+    /* बेस रिस्टाइलिंग */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    /* मुख्य कंटेनर स्टाइल */
+    #configContainer,
+    #quizContainer,
+    #meaningContainer,
+    #paragraphContainer,
+    #resultContainer,
+    #shareContainer {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    /* केवल आवश्यक तत्वों को दिखाना */
+    #configContainer h3,
+    #configContainer label,
+    #configContainer input {
+      display: none;
+    }
+    /* Start Quiz बटन का स्टाइल */
+    #saveConfig {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 30px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #saveConfig:hover {
+      background-color: #0056b3;
+    }
+    /* अन्य बटन्स का स्टाइल */
+    button {
+      background-color: #007BFF;
+      color: #fff;
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    /* Dropdown स्टाइल */
+    select {
+      padding: 8px;
+      font-size: 16px;
+      margin: 0 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    /* YouTube video / Player स्टाइल */
+    iframe, #player {
+      width: 100%;
+      max-width: 560px;
+      height: 315px;
+      margin: 20px auto;
+      display: block;
+      border-radius: 8px;
+    }
+    
+    /* Instructions styling */
+    .instructions {
+      background-color: #eef2f7;
+      border: 1px solid #d1d9e6;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .instructions h4 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #007BFF;
+    }
+    .instructions ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+    .instructions li {
+      margin-bottom: 5px;
+      line-height: 1.5;
+    }
+    
+    /* User Authentication fields styling */
+    #configContainer .loginForm {
+      display: block;
+      margin-bottom: 20px;
+    }
+    #configContainer .loginForm label {
+      display: inline-block;
+      margin: 5px;
+      font-weight: bold;
+    }
+    #configContainer .loginForm input {
+      display: inline-block;
+      padding: 8px;
+      font-size: 16px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #configContainer .loginForm label[for="togglePassword"] {
+      font-weight: normal;
+      cursor: pointer;
+    }
+    /* Share Container Styling */
+    #shareContainer h4 {
+      margin-bottom: 15px;
+    }
+    #resultCanvas {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Configuration Section -->
+  <div id="configContainer">
+    <h3>Configure YouTube Videos</h3>
+    <label for="video1Link">Video 1 Embed Link: </label>
+    <input type="link" id="video1Link" value="https://www.youtube.com/embed/EZkg4JVP4mY?si=SLKoHMBEhb7D0GxS" /><br /><br />
+    <label for="video2Link">Video 2 Embed Link: </label>
+    <input type="link" id="video2Link" value="https://www.youtube.com/embed/i2dN4kOrlNs" /><br /><br />
+    
+    <!-- New User Authentication Fields (Name & Password) -->
+    <div class="loginForm">
+      <label for="userName">Name:</label>
+      <input type="text" id="userName" placeholder="Enter your name" /><br />
+      <label for="userPassword">
+        Password: <span style="font-weight:normal;">(mai English roj padhunga)</span>
+      </label>
+      <input type="password" id="userPassword" placeholder="Enter password" />
+      <label for="togglePassword">
+        <input type="checkbox" id="togglePassword" /> Show Password
+      </label>
+    </div>
+    
+    <!-- Test Instructions (Start Quiz के बटन से ऊपर) -->
+    <div class="instructions">
+      <h4>Test Instructions</h4>
+      <ul>
+        <li>Watch the YouTube videos carefully.</li>
+        <li>Note the vocabulary words and their meanings.</li>
+        <li>After each video, the word and its meaning will be displayed.</li>
+        <li>Click the "Done" button once you have noted the meaning to proceed.</li>
+        <li>Complete the paragraph by selecting the correct words from the dropdown options.</li>
+        <li>Click 'Submit' to check your answer.</li>
+      </ul>
+    </div>
+    
+    <button id="saveConfig">Save and Start Quiz</button>
+  </div>
+
+  <!-- Quiz Container -->
+  <div id="quizContainer">
+    <div id="videoContainer"></div>
+    <div id="meaningContainer"></div>
+    <div id="paragraphContainer">
+      <p>
+        He tried to <select id="word1"></select> the situation but his <select id="word2"></select> failed.
+      </p>
+      <button id="submitAnswer">Submit</button>
+    </div>
+    <div id="resultContainer"></div>
+    <!-- Share Container: Displayed after successful quiz completion -->
+    <div id="shareContainer" style="display:none;">
+      <h4>Your Quiz Result</h4>
+      <canvas id="resultCanvas" width="500" height="300"></canvas>
+      <br>
+      <button id="downloadImage">Download Image</button>
+      <button id="shareWhatsApp">Share on WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- Load YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const words = [
+      { word: "analyze", meaning: "विश्लेषण करना", videoId: "M7lc1UVf-VE" },
+      { word: "attempt", meaning: "प्रयास", videoId: "i2dN4kOrlNs" }
+    ];
+
+    let currentStep = 0;
+    let player;
+
+    // Toggle Password Visibility
+    document.getElementById("togglePassword").addEventListener("change", function() {
+      const passwordField = document.getElementById("userPassword");
+      passwordField.type = this.checked ? "text" : "password";
+    });
+
+    document.getElementById("saveConfig").addEventListener("click", function() {
+      const userPassword = document.getElementById("userPassword").value.trim();
+      if (userPassword !== "mai English roj padhunga") {
+        alert("Wrong password");
+        return;
+      }
+      
+      function extractVideoId(link) {
+        const parts = link.split('/embed/');
+        if (parts.length > 1) {
+          return parts[1].split('?')[0];
+        }
+        return link;
+      }
+      
+      words[0].videoId = extractVideoId(document.getElementById("video1Link").value.trim());
+      words[1].videoId = extractVideoId(document.getElementById("video2Link").value.trim());
+      
+      document.getElementById("configContainer").style.display = "none";
+      document.getElementById("quizContainer").style.display = "block";
+      showVideo();
+    });
+
+    function showVideo() {
+      if (currentStep < words.length) {
+        document.getElementById("videoContainer").innerHTML = '<div id="player"></div>';
+        player = new YT.Player("player", {
+          height: "315",
+          width: "560",
+          videoId: words[currentStep].videoId,
+          events: {
+            "onStateChange": onPlayerStateChange
+          }
+        });
+      }
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        player.destroy();
+        showMeaning();
+      }
+    }
+
+    // Modified showMeaning function with a "Done" button
+    function showMeaning() {
+      document.getElementById("videoContainer").innerHTML = "";
+      let meaningHTML = `<p>${words[currentStep].word} - ${words[currentStep].meaning}</p>`;
+      meaningHTML += `<button id="doneMeaning">Done</button>`;
+      document.getElementById("meaningContainer").innerHTML = meaningHTML;
+      document.getElementById("meaningContainer").style.display = "block";
+      
+      document.getElementById("doneMeaning").addEventListener("click", function() {
+        document.getElementById("meaningContainer").style.display = "none";
+        currentStep++;
+        if (currentStep < words.length) {
+          showVideo();
+        } else {
+          showParagraph();
+        }
+      });
+    }
+
+    function showParagraph() {
+      document.getElementById("paragraphContainer").style.display = "block";
+      words.forEach((word, index) => {
+        document.getElementById(`word${index + 1}`).innerHTML =
+          `<option value="">Select</option>` +
+          words.map(w => `<option value="${w.word}">${w.word}</option>`).join("");
+      });
+    }
+
+    document.getElementById("submitAnswer").addEventListener("click", function() {
+      const selected1 = document.getElementById("word1").value;
+      const selected2 = document.getElementById("word2").value;
+      
+      if (!selected1 || !selected2) {
+        alert("Please select words before submitting.");
+        return;
+      }
+      
+      if (selected1 === words[0].word && selected2 === words[1].word) {
+        document.getElementById("resultContainer").innerHTML = "<p>Correct! Well done.</p>";
+        // Generate the result image and show the share container
+        generateResultImage();
+        document.getElementById("shareContainer").style.display = "block";
+      } else {
+        document.getElementById("resultContainer").innerHTML = "<p>Wrong! Try again.</p>";
+        document.getElementById("paragraphContainer").style.display = "none";
+        setTimeout(() => {
+          document.getElementById("paragraphContainer").style.display = "block";
+        }, 2000);
+      }
+      document.getElementById("resultContainer").style.display = "block";
+    });
+
+    // Function to generate image with quiz details using canvas
+    function generateResultImage() {
+      const canvas = document.getElementById("resultCanvas");
+      const ctx = canvas.getContext("2d");
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw background
+      ctx.fillStyle = "#f5f7fa";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Set text properties
+      ctx.fillStyle = "#333";
+      ctx.font = "24px Arial";
+      ctx.fillText("Quiz Result", 20, 40);
+      
+      ctx.font = "18px Arial";
+      const userName = document.getElementById("userName").value || "Anonymous";
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      const date = now.toLocaleDateString();
+      const quizWords = words.map(w => w.word).join(", ");
+      
+      ctx.fillText("Name: " + userName, 20, 80);
+      ctx.fillText("Time: " + time, 20, 110);
+      ctx.fillText("Date: " + date, 20, 140);
+      ctx.fillText("Quiz on: " + quizWords, 20, 170);
+    }
+
+    // Download Image Button Event
+    document.getElementById("downloadImage").addEventListener("click", function(){
+      const canvas = document.getElementById("resultCanvas");
+      const image = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = image;
+      a.download = "quiz-result.png";
+      a.click();
+    });
+
+    // Share on WhatsApp Button Event using Web Share API if available, else fallback
+    document.getElementById("shareWhatsApp").addEventListener("click", function(){
+      const canvas = document.getElementById("resultCanvas");
+      canvas.toBlob(blob => {
+        const file = new File([blob], "quiz-result.png", { type: blob.type });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: "Quiz Result",
+            text: "Check out my quiz result!"
+          })
+          .catch(err => console.error(err));
+        } else {
+          // Fallback: Share quiz details as text via WhatsApp share link
+          const shareText = `Quiz Result\nName: ${document.getElementById("userName").value}\nTime: ${new Date().toLocaleTimeString()}\nDate: ${new Date().toLocaleDateString()}\nQuiz on: ${words.map(w => w.word).join(", ")}`;
+          const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
+          window.open(whatsappUrl, '_blank');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
